@@ -2,7 +2,7 @@ import firebase from "firebase/app";
 
 const config ={
     apiKey: "AIzaSyDtXOvG9tmXRYjDD7O3EYjzz2syivlbTAA",
-    authDomain: "horno-panadero.firebaseapp.com",
+    authDomain: "horno-firebase-react.web.app",
     databaseURL: "https://horno-panadero-default-rtdb.firebaseio.com",
     projectId: "horno-panadero",
     storageBucket: "horno-panadero.appspot.com",
