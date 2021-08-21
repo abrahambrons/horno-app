@@ -3,6 +3,30 @@ import {Line, Doughnut} from 'react-chartjs-2';
 import firebase from '../Firebase/firebase';
 require('firebase/database');
 
+export function autenticar(){
+    firebase.auth()
+        .signInWithPopup("horno-panadero.firebaseapp.com")
+        .then((result) => {
+            /** @type {firebase.auth.OAuthCredential} */
+            var credential = result.credential;
+
+            // This gives you a Google Access Token. You can use it to access the Google API.
+            var token = credential.accessToken;
+            // The signed-in user info.
+            var user = result.user;
+            // ...
+        }).catch((error) => {
+            // Handle Errors here.
+            var errorCode = error.code;
+            var errorMessage = error.message;
+            // The email of the user's account used.
+            var email = error.email;
+            // The firebase.auth.AuthCredential type that was used.
+            var credential = error.credential;
+            // ...
+        });
+}
+
 const Stats = () => {
     const [lineahorno1, setlineahorno1] = useState([]);
     const [chartOptions, setchartOptions] = useState();
@@ -17,7 +41,6 @@ const Stats = () => {
     const [lecturapordia, setlecturapordia] = useState();
     const [labelpordia, setlabelpordia] = useState();
     
-
     function returnLecturasByDia(valor,newday = 0){
         let newdate = new Date(diaselect)
         if(newday > 0)
@@ -64,7 +87,7 @@ const Stats = () => {
             setlineahorno1(arr =>[...arr.slice(1), snapshot.val()])
         })
 
-        firebaseDatabase.ref('Nodemcu/Dia').limitToLast(10000).once('value',(snapshot)=>{
+        firebaseDatabase.ref('Nodemcu/Dia').limitToLast(20000).once('value',(snapshot)=>{
             let tempArray = []
             snapshot.forEach((child) => {
                 tempArray.push(child.val())
@@ -72,7 +95,7 @@ const Stats = () => {
             setdia(tempArray)
         })
 
-        firebaseDatabase.ref('Nodemcu/TThermok').limitToLast(10000).once('value',(snapshot)=>{
+        firebaseDatabase.ref('Nodemcu/TThermok').limitToLast(20000).once('value',(snapshot)=>{
             let tempArray = []
             snapshot.forEach((child) => {
                 tempArray.push(child.val())
@@ -80,7 +103,7 @@ const Stats = () => {
             setlecturas(tempArray)
         })
 
-        firebaseDatabase.ref('Nodemcu/Hora').limitToLast(10000).once('value',(snapshot)=>{
+        firebaseDatabase.ref('Nodemcu/Hora').limitToLast(20000).once('value',(snapshot)=>{
             let tempArray = []
             snapshot.forEach((child) => {
                 tempArray.push(child.val())

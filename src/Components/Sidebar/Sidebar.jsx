@@ -1,7 +1,52 @@
 import { useState } from 'react';
+import firebase from '../Firebase/firebase';
+require('firebase/auth');
 
 const Sidebar = () => {
     const [mode, setmode] = useState('light');
+    const [displayName, setdisplayName] = useState();
+    const [profileImage, setprofileImage] = useState();
+    const [authenticated, setauthenticated] = useState();
+
+    function desautenticar(ev){
+        ev.preventDefault();
+        firebase.auth().signOut().then(() => {
+            setauthenticated(undefined);
+            setprofileImage(undefined);
+            setdisplayName(undefined);
+          }).catch((error) => {
+            
+          });
+    }
+
+    function autenticar(ev){
+        ev.preventDefault();
+        let provider = new firebase.auth.GoogleAuthProvider();
+        firebase.auth()
+            .signInWithPopup(provider)
+            .then((result) => {
+                /** @type {firebase.auth.OAuthCredential} */
+                var credential = result.credential;
+    
+                // This gives you a Google Access Token. You can use it to access the Google API.
+                var token = credential.accessToken;
+                // The signed-in user info.
+                var user = result.user;
+                setauthenticated(user);
+                setprofileImage(user.photoURL);
+                setdisplayName(user.displayName);
+                // ...
+            }).catch((error) => {
+                // Handle Errors here.
+                var errorCode = error.code;
+                var errorMessage = error.message;
+                // The email of the user's account used.
+                var email = error.email;
+                // The firebase.auth.AuthCredential type that was used.
+                var credential = error.credential;
+                // ...
+            });
+    }
 
     function toggleDarkMode(e){
         e.preventDefault()
@@ -49,14 +94,14 @@ const Sidebar = () => {
             
             <div className="flex flex-col justify-between flex-1 mt-6">
                 <nav>
-                    <a className="flex items-center px-4 py-2 text-gray-700 bg-gray-200 rounded-md dark:bg-gray-700 dark:text-gray-200" href="#">
-                        <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M19 11H5M19 11C20.1046 11 21 11.8954 21 13V19C21 20.1046 20.1046 21 19 21H5C3.89543 21 3 20.1046 3 19V13C3 11.8954 3.89543 11 5 11M19 11V9C19 7.89543 18.1046 7 17 7M5 11V9C5 7.89543 5.89543 7 7 7M7 7V5C7 3.89543 7.89543 3 9 3H15C16.1046 3 17 3.89543 17 5V7M7 7H17" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
-                        </svg>
+                    <a 
+                        className="flex items-center px-4 py-2 text-gray-700 bg-gray-200 rounded-md dark:bg-gray-700 dark:text-gray-200" href="#">
+                            <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M19 11H5M19 11C20.1046 11 21 11.8954 21 13V19C21 20.1046 20.1046 21 19 21H5C3.89543 21 3 20.1046 3 19V13C3 11.8954 3.89543 11 5 11M19 11V9C19 7.89543 18.1046 7 17 7M5 11V9C5 7.89543 5.89543 7 7 7M7 7V5C7 3.89543 7.89543 3 9 3H15C16.1046 3 17 3.89543 17 5V7M7 7H17" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                            </svg>
 
-                        <span className="mx-4 font-medium">Inicio</span>
+                            <span className="mx-4 font-medium">Inicio</span>
                     </a>
-
                     <hr className="my-6 dark:border-gray-600" />
                     {}
                     <a 
@@ -69,6 +114,56 @@ const Sidebar = () => {
 
                             <span className="mx-4 font-medium">Modo Oscuro</span>
                     </a>
+                    <hr className="my-6 dark:border-gray-600" />
+                    {
+                        authenticated?
+                        <div class="flex items-center p-2 mt-12 space-x-4 justify-self-end">
+                            <img
+                            src={profileImage}
+                            alt=""
+                            class="w-12 h-12 rounded-lg"
+                            />
+                            <div>
+                            <h2 class="text-lg font-semibold">{ displayName }</h2>
+                            <span class="flex items-center space-x-1">
+                                <a 
+                                    href="#" 
+                                    onClick={(e)=>desautenticar(e)}
+                                    class="text-xs hover:underline text-gray-600"
+                                >Cerrar Sesión</a
+                                >
+                            </span>
+                            </div>
+                        </div>
+                        :
+                        <a 
+                            onClick={(e)=>autenticar(e)}
+                            className="flex items-center px-4 py-2 mt-5 text-gray-600 transition-colors duration-200 transform rounded-md dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700 dark:hover:text-gray-200 hover:text-gray-700" href="#">
+                                <svg
+                                    class="w-5 h-5"
+                                    viewBox="0 0 24 24"
+                                    fill="none"
+                                    xmlns="http://www.w3.org/2000/svg"
+                                >
+                                    <path
+                                    d="M16 7C16 9.20914 14.2091 11 12 11C9.79086 11 8 9.20914 8 7C8 4.79086 9.79086 3 12 3C14.2091 3 16 4.79086 16 7Z"
+                                    stroke="currentColor"
+                                    stroke-width="2"
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    />
+                                    <path
+                                    d="M12 14C8.13401 14 5 17.134 5 21H19C19 17.134 15.866 14 12 14Z"
+                                    stroke="currentColor"
+                                    stroke-width="2"
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    />
+                                </svg>
+
+                                <span className="mx-4 font-medium">Iniciar Sesión</span>
+                        </a>
+                    }
                 </nav>
             </div>
         </div>
